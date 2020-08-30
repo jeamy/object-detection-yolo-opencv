@@ -18,7 +18,9 @@ parser.add_argument('--video_path', help="Path of video file",
                     default="rtsp://admin:123456@192.168.8.50:554/h264Preview_01_main")
 parser.add_argument('--verbose', help="To print statements", default=True)
 parser.add_argument('--scale', help="scale vid in percent", default=100)
-parser.add_argument('--max_height', help="scale vid in percent", default=900)
+parser.add_argument('--max_height', help="VVideo max height in pixel", default=900)
+parser.add_argument('--weights', help="Yolo weights", default="./weigths/yolov4.weights")
+parser.add_argument('--config', help="Yolo brain", default="./cfg/yolov4.cfg")
 args = parser.parse_args()
 delay = 5
 

@@ -19,7 +19,7 @@ class Camera:
 
     # Load yolo
     def load_yolo(self):
-        net = cv2.dnn.readNet("/media/programming/YOLO_Weights/yolov4.weights", "yolov4.cfg")
+        net = cv2.dnn.readNet(self.args.weights, self.args.config)
         classes = []
         with open("coco.names", "r") as f:
             classes = [line.strip() for line in f.readlines()]

@@ -18,7 +18,7 @@ parser.add_argument('--video_path', help="Path of video file", default="/media/p
 parser.add_argument('--image_path', help="Path of image to detect objects", default="Images/bicycle.jpg")
 parser.add_argument('--verbose', help="To print statements", default=True)
 parser.add_argument('--scale', help="scale vid in percent", default=100)
-parser.add_argument('--max_height', help="max height in pixel", default=900)
+parser.add_argument('--max_height', help="Video max height in pixel", default=900)
 args = parser.parse_args()
 
 
@@ -38,7 +38,7 @@ def rescale_frame(frame, percent=75):
 
 # Load yolo
 def load_yolo():
-    net = cv2.dnn.readNet("/media/programming/YOLO_Weights/yolov4.weights", "yolov4.cfg")
+    net = cv2.dnn.readNet("./weigths/yolov4.weights", "./cfg/yolov4.cfg")
     classes = []
     with open("coco.names", "r") as f:
         classes = [line.strip() for line in f.readlines()]
