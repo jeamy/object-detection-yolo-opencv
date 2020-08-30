@@ -8,14 +8,13 @@ import argparse
 
 # rtsp://admin:123456@192.168.8.50:554/h264Preview_01_main
 # rtsp://admin:12345@192.168.8.51:554/live/main
-# rtsp://prosmart:asgard69a%23ps@192.168.8.135/stream=0
+# rtsp://prosmart:asgard69a%23ps@192.168.8.135:554/stream=0
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--play_video', help="Tue/False", default=True)
 # parser.add_argument('--video_path', help="Path of video file", default="/media/programming/testtvid/1.1515-video.mp4")
 # parser.add_argument('--video_path', help="Path of video file", default="/media/programming/testtvid/2481-video.mp4")
-parser.add_argument('--video_path', help="Path of video file",
-                    default="rtsp://admin:123456@192.168.8.50:554/h264Preview_01_main")
+parser.add_argument('--video_path', help="Path of video file", default="rtsp://prosmart:asgard69@192.168.8.135:554/")
 parser.add_argument('--verbose', help="To print statements", default=True)
 parser.add_argument('--scale', help="scale vid in percent", default=100)
 parser.add_argument('--max_height', help="VVideo max height in pixel", default=900)
@@ -47,6 +46,7 @@ def gen(cam):
             continue
     time.sleep(250)
 
+
 @app.route('/video_feed')
 def video_feed():
     return Response(gen(camera),
@@ -56,20 +56,19 @@ def video_feed():
 if __name__ == '__main__':
     video_play = args.play_video
     video_path = args.video_path
-    sopen = False
     try:
-        print("Opening stream " + video_path)
-        cap = cv2.VideoCapture(video_path)
-        while not cap.isOpened():
-            key = cv2.waitKey(5000)
-            print("Waiting for stream")
-            if key == 27:
+        while True:
+            print("Opening stream " + video_path)
+            cap = cv2.VideoCapture(video_path)
+            if cap.isOpened():
                 break
-        sopen = True
+            print("Waiting for stream ...")
+            time.sleep(delay)
+            key = cv2.waitKey(0)
+            if key == 27:
+                sys.exit()
     except Exception as err:
         print("Connection error:", err)
-
-    if not sopen:
         sys.exit()
 
     camera = Camera(cap, args)
