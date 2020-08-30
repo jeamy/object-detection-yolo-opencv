@@ -1,11 +1,6 @@
 import cv2
 import numpy as np
 import argparse
-import time
-
-# rtsp://admin:123456@192.168.8.50:554/h264Preview_01_main
-# rtsp://admin:12345@192.168.8.51:554/live/main
-# rtsp://prosmart:asgard69a%23ps@192.168.8.135/stream=0
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--webcam', help="True/False", default=False)
@@ -38,7 +33,7 @@ def rescale_frame(frame, percent=75):
 
 # Load yolo
 def load_yolo():
-    net = cv2.dnn.readNet("./weigths/yolov4.weights", "./cfg/yolov4.cfg")
+    net = cv2.dnn.readNet("./weigths/yolov3.weights", "./cfg/yolov3.cfg")
     classes = []
     with open("coco.names", "r") as f:
         classes = [line.strip() for line in f.readlines()]

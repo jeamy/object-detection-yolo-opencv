@@ -1,2 +1,2 @@
 Weights and cfg (or configuration) files can be downloaded from https://pjreddie.com/darknet/yolo.
-Store weigths in a directory called 'weights'. ;-)
+Store weigths in a directory called 'weights' and config files in 'cfg'. ;-)

@@ -1,10 +1,6 @@
 import cv2
 import numpy as np
 
-# defining face detector
-face_cascade = cv2.CascadeClassifier("haarcascade_frontalface_alt2.xml")
-ds_factor = 0.6
-
 
 class Camera:
 
@@ -12,6 +8,21 @@ class Camera:
         self.cap = cap
         self.args = args
         self.model, self.classes, self.colors, self.output_layers = self.load_yolo()
+        # defining face detector
+        # self.face_cascade = cv2.CascadeClassifier("./haarcascades/haarcascade_frontalface_alt2.xml")
+        frame_count = int(self.cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        height = int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        if self.args.verbose:
+            print('Frame count:', frame_count)
+            print('Frame width:', height)
+            print('Frame height:', int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))
+            print('Frame rate:', self.cap.get(cv2.CAP_PROP_FPS))
+            print("Scale: " + str(self.args.scale))
+
+        if int(self.args.scale) == 100 and height != 0:
+            self.args.scale = int(int(self.args.max_height) / height * 100)
+            if self.args.verbose:
+                print("Scale: " + str(self.args.scale))
 
     def __del__(self):
         # releasing camera
@@ -33,7 +44,8 @@ class Camera:
     def detect_objects(self, img, net, output_layers):
         blob = cv2.dnn.blobFromImage(img, scalefactor=0.00392, size=(320, 320), mean=(0, 0, 0), swapRB=True, crop=False)
         net.setInput(blob)
-        outputs = net.forward(output_layers)
+        self.forward = net.forward(output_layers)
+        outputs = self.forward
         return blob, outputs
 
     def get_box_dimensions(self, outputs, height, width):
@@ -45,7 +57,7 @@ class Camera:
                 scores = detect[5:]
                 class_id = np.argmax(scores)
                 conf = scores[class_id]
-                if conf > 0.3:
+                if conf > float(self.args.confidence):
                     center_x = int(detect[0] * width)
                     center_y = int(detect[1] * height)
                     w = int(detect[2] * width)
@@ -79,20 +91,6 @@ class Camera:
                 cv2.putText(img, "h: " + str(h), (x, y + h + 70), font, 1, color, 2)
         img = self.rescale_frame(img, percent=int(self.args.scale))
         return img
-        # cv2.imshow("Image", img)
-
-    def start_video(self):
-        frame_count = int(self.cap.get(cv2.CAP_PROP_FRAME_COUNT))
-        print('Frame count:', frame_count)
-        height = int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        print('Frame width:', height)
-        print('Frame height:', int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))
-        print('Frame rate:', self.cap.get(cv2.CAP_PROP_FPS))
-        print("Scale: " + str(self.args.scale))
-
-        if int(self.args.scale) == 100 and height != 0:
-            self.args.scale = int(int(self.args.max_height) / height * 100)
-            print("Scale: " + str(self.args.scale))
 
     # cap.set(cv2.CAP_PROP_POS_FRAMES, 100)
     def get_frame(self):
@@ -104,15 +102,16 @@ class Camera:
         ret, jpeg = cv2.imencode('.jpg', img)
         return jpeg.tobytes()
 
-    def get_image(self):
-        # extracting frames
-        ret, frame = self.video.read()
-        frame = cv2.resize(frame, None, fx=ds_factor, fy=ds_factor,
-                           interpolation=cv2.INTER_AREA)
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        face_rects = face_cascade.detectMultiScale(gray, 1.3, 5)
-        for (x, y, w, h) in face_rects:
-            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-            break  # encode OpenCV raw frame to jpg and displaying it
-        ret, jpeg = cv2.imencode('.jpg', frame)
-        return jpeg.tobytes()
+    # for later use
+    # def get_image(self):
+    #     # extracting frames
+    #     ret, frame = self.video.read()
+    #     frame = cv2.resize(frame, None, fx=int(self.args.scale/100), fy=int(self.args.scale/100),
+    #                        interpolation=cv2.INTER_AREA)
+    #     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    #     face_rects = face_cascade.detectMultiScale(gray, 1.3, 5)
+    #     for (x, y, w, h) in face_rects:
+    #         cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+    #         break  # encode OpenCV raw frame to jpg and displaying it
+    #     ret, jpeg = cv2.imencode('.jpg', frame)
+    #     return jpeg.tobytes()
