@@ -1,3 +1,5 @@
 yolov3.weights
 yolov3-tiny.weights
 yolo_object.py
+/weigths/
+/coco.names.original
